@@ -4,7 +4,7 @@ beautify = require('js-beautify').js_beautify
 config = require './config'
 
 dump =
-  format_version: '0.0.2'
+  format_version: require('package').version
   base_url: config.base_url
   base_image_url: config.base_image_url
   base_image_thumb_url: config.base_image_thumb_url
