@@ -4,8 +4,10 @@ beautify = require('js-beautify').js_beautify
 config = require './config'
 
 dump =
-  format_version: '0.0.1'
+  format_version: '0.0.2'
   base_url: config.base_url
+  base_image_url: config.base_image_url
+  base_image_thumb_url: config.base_image_thumb_url
   dump_date: (new Date()).toISOString()
   games: []
 
@@ -24,6 +26,10 @@ gameDataCollector = new Crawler
 
     game = {}
 
+    # UID ####################################
+    
+    game.uid = result.window.location.href.split('uid=')[1]
+
     # TITLE / AUTHOR/ TYPE ##################
 
     [ game.title
@@ -34,10 +40,6 @@ gameDataCollector = new Crawler
       game.type = 48
     else
       game.type = 72
-
-    # UID ####################################
-    
-    game.uid = result.window.location.href.split('uid=')[1]
     
     # LINKS ##################################
 
@@ -47,6 +49,10 @@ gameDataCollector = new Crawler
         type: a.textContent
         href: a.href
       game.links.push link
+
+    # DESCRIPTION ############################
+    
+    game.description = $('.links').next().text()
 
     # SCREENSHOTS ############################
 
@@ -65,6 +71,10 @@ gameDataCollector = new Crawler
         src: getImageFilename a.href
         thumb: getThumbFilename $(a).children('img')[0].src
       game.shots.push shot
+
+    # COUNT COMMENTS #########################
+    
+    game.commentCount = $('.comment').length
 
     dump.games.push game
     console.error beautify JSON.stringify(game),
@@ -97,7 +107,5 @@ start = new Crawler
       gameLinkCollector.queue page.href
 
 start_url = config.base_url + '?action=preview'
-
-#gameDataCollector.queue 'http://www.ludumdare.com/compo/ludum-dare-26/?action=preview&uid=1712'
 
 start.queue start_url
